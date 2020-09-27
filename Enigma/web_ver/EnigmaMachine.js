@@ -1,7 +1,9 @@
+const charSetSize = 26
+
 class Mapping {
     constructor(mapping) {
-        this.mapping = mapping
-        this.mappingRev = this.reverseMap(mapping)
+        this.mapping = mapping;
+        this.mappingRev = this.reverseMap(mapping);
     }
 
     reverseMap(wiring) {
@@ -9,9 +11,8 @@ class Mapping {
         for (var key in wiring) {
             rev[wiring[key]] = key;
         }
-        return rev
+        return rev;
     }
-
     substitute() {}
 
     toString() {
@@ -26,7 +27,7 @@ class Mapping {
 
 class Rotor extends Mapping {
     constructor(wiring) {
-        super(wiring)
+        super(wiring);
         this.position = 0;
     }
 
@@ -35,8 +36,8 @@ class Rotor extends Mapping {
     }
 
     substitute(char, direction) {
-        char = this.asciiToChar((this.charToASCII(char) + this.position) % 26);
-        return direction ? this.mapping[char] : this.mappingRev[char];
+        char = this.asciiToChar((this.charToASCII(char) + this.position) % charSetSize);
+        return direction ? this.mapping[char] : this.mappingRev[char]
     }
 
     charToASCII(char) {
@@ -53,27 +54,25 @@ class PlugBoard extends Mapping {
         super(connections);
     }
 
-    substitute(char, direction) {
-        if (char in this.mapping && direction) {
-            return this.mapping[char]
-        } else if (char in this.mappingRev && !direction) {
-            return this.mappingRev[char]
+    substitute(char) {
+        if (char in this.mapping) {
+            return this.mapping[char];
+        } else if (char in this.mappingRev) {
+            return this.mappingRev[char];
         }
-        return char
+        return char;
     }
 }
 
 class Reflector extends Mapping {
     constructor(mapping) {
-        super(mapping)
+        super(mapping);
     }
 
-    substitute(char, direction) {
-        return direction ? this.mapping[char] : this.mappingRev[char];
+    substitute(char) {
+        return this.mapping[char];
     }
 }
-
-
 
 class EngimaMachine {
     constructor(rf, r1, r2, r3, pb) {
@@ -88,7 +87,7 @@ class EngimaMachine {
         char = char.toUpperCase();
         let oldChar = char
         if (char.length === 1 && char.match(/[a-z]/i)) {
-            char = this.pb.substitute(char, true);
+            char = this.pb.substitute(char);
             console.log(`${oldChar} --> ${char}`);
             oldChar = char;
             char = this.r1.substitute(char, true);
@@ -100,7 +99,7 @@ class EngimaMachine {
             char = this.r3.substitute(char, true);
             console.log(`${oldChar} --> ${char}`);
             oldChar = char;
-            char = this.rf.substitute(char, true);
+            char = this.rf.substitute(char);
             console.log(`${oldChar} --> ${char}`);
             oldChar = char;
             char = this.r3.substitute(char, false);
@@ -112,7 +111,7 @@ class EngimaMachine {
             char = this.r1.substitute(char, false);
             console.log(`${oldChar} --> ${char}`);
             oldChar = char;
-            char = this.pb.substitute(char, false);
+            char = this.pb.substitute(char);
             console.log(`${oldChar} --> ${char}`);
         }
         this.stepRotors()
@@ -121,7 +120,7 @@ class EngimaMachine {
 
     stepRotors() {
         this.r1.rotate()
-        if (this.r1.position == 26) {
+        if (this.r1.position == 5) {
             this.r1.position = 0;
             this.r2.rotate();
         }
@@ -134,44 +133,43 @@ class EngimaMachine {
         }
     }
 }
-// let alp = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-// let r1A = "JGDQOXUSCAMIFRVTPNEWKBLZYH";
-// let r2A = "NTZPSFBOKMWRCJDIVLAEYUXHGQ";
-// let r3A = "JVIUBHTCDYAKEQZPOSGXNRMWFL";
-// let rfA = "EJMZALYXVBWFCRQUONTSPIKHGD";
+let alp = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let r1A = "JGDQOXUSCAMIFRVTPNEWKBLZYH";
+let r2A = "NTZPSFBOKMWRCJDIVLAEYUXHGQ";
+let r3A = "JVIUBHTCDYAKEQZPOSGXNRMWFL";
+let rfA = "EJMZALYXVBWFCRQUONTSPIKHGD";
 
-// let r1Map = {};
-// let r2Map = {};
-// let r3Map = {};
-// let rfMap = {};
-// for (let i = 0; i < 26; i++) {
-//     r1Map[alp.charAt(i)] = r1A.charAt(i);
-//     r2Map[alp.charAt(i)] = r2A.charAt(i);
-//     r3Map[alp.charAt(i)] = r3A.charAt(i);
-//     rfMap[alp.charAt(i)] = rfA.charAt(i);
-// }
+let r1Map = {};
+let r2Map = {};
+let r3Map = {};
+let rfMap = {};
+let pbMap = {};
 
-// let rf = new Reflector(rfMap);
-// let r1 = new Rotor(r1Map);
-// let r2 = new Rotor(r2Map);
-// let r3 = new Rotor(r3Map);
-// let pb = new PlugBoard({
-//     A: "X",
-//     B: "N",
-//     Q: "M",
-//     D: "Z",
-//     K: "A",
-//     F: "L",
-//     G: "Y",
-//     H: "X",
-//     I: "V",
-//     J: "P",
-// });
+for (let i = 0; i < charSetSize; i++) {
+    r1Map[alp.charAt(i)] = r1A.charAt(i);
+    r2Map[alp.charAt(i)] = r2A.charAt(i);
+    r3Map[alp.charAt(i)] = r3A.charAt(i);
+    if (alp.charAt(i) in rfMap) {
+        rfA[rfMap[alp.charAt(i)]] = alp.charAt(i);
+    } else {
+        rfMap[alp.charAt(i)] = rfA.charAt(i);
+    }
+    if (i < 10) {
+        pbMap[alp.charAt(i)] = alp.charAt(25 - i);
+    }
+}
 
+let rf = new Reflector(rfMap);
 
-// let myMachine = new EngimaMachine(rf, r1, r2, r3, pb);
+let r1_1 = new Rotor(r1Map);
+let r2_1 = new Rotor(r2Map);
+let r3_1 = new Rotor(r3Map);
 
-// let ch1 = myMachine.keyPress("A");
-// console.log();
-// let ch2 = myMachine.keyPress("A");
-// console.log(ch1, ch2);
+let r1_2 = new Rotor(r1Map);
+let r2_2 = new Rotor(r2Map);
+let r3_2 = new Rotor(r3Map);
+
+let pb = new PlugBoard(pbMap);
+
+let myMachine1 = new EngimaMachine(rf, r1_1, r2_1, r3_1, pb);
+let myMachine2 = new EngimaMachine(rf, r1_2, r2_2, r3_2, pb);

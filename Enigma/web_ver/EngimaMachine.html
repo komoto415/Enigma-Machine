@@ -30,40 +30,6 @@
     <div id="cipher"></div><br>
     <button id="reset" onclick="reset()">Reset</button>
     <script>
-        let alp = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        let r1A = "JGDQOXUSCAMIFRVTPNEWKBLZYH";
-        let r2A = "NTZPSFBOKMWRCJDIVLAEYUXHGQ";
-        let r3A = "JVIUBHTCDYAKEQZPOSGXNRMWFL";
-        let rfA = "EJMZALYXVBWFCRQUONTSPIKHGD";
-
-        let r1Map = {};
-        let r2Map = {};
-        let r3Map = {};
-        let rfMap = {};
-        for (let i = 0; i < 26; i++) {
-            r1Map[alp.charAt(i)] = r1A.charAt(i);
-            r2Map[alp.charAt(i)] = r2A.charAt(i);
-            r3Map[alp.charAt(i)] = r3A.charAt(i);
-            rfMap[alp.charAt(i)] = rfA.charAt(i);
-        }
-
-        let rf = new Reflector(rfMap);
-        let r1 = new Rotor(r1Map);
-        let r2 = new Rotor(r2Map);
-        let r3 = new Rotor(r3Map);
-        let pb = new PlugBoard({
-            A: "X",
-            B: "N",
-            Q: "M",
-            D: "Z",
-            K: "A",
-            F: "L",
-            G: "Y",
-            H: "X",
-            I: "V",
-            J: "P",
-        });
-        let myMachine = new EngimaMachine(rf, r1, r2, r3, pb);
         plainDom = document.getElementById("plain");
         cipherDom = document.getElementById("cipher");
         plainDom.addEventListener("input", e => {
@@ -74,7 +40,7 @@
                 } else {
                     var key = (e.data);
                     console.log(`Pressed: ${key}`);
-                    cipher = myMachine.keyPress(key);
+                    cipher = myMachine1.keyPress(key);
                     console.log(`Output: ${cipher}`);
                 }
                 console.log(cipher)
@@ -86,10 +52,9 @@
         });
 
         reset = () => {
-            myMachine = new EngimaMachine(rf, r1, r2, r3, pb);
-            r1.position = 0;
-            r2.position = 0;
-            r3.position = 0;
+            myMachine1.r1.position = 0;
+            myMachine1.r2.position = 0;
+            myMachine1.r3.position = 0;
             plainDom.value = "";
             cipherDom.innerHTML = "";
             go = false
